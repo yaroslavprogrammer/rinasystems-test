@@ -1,2 +1,4 @@
 celery
 nltk
+redis
+msgpack-python

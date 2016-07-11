@@ -1,7 +1,8 @@
 import sys
 
 from words import workers
-from words.lib import emails_from_dir, find_most_common_words
+from words.lib import emails_from_dir
+from words.tasks import find_most_common_words
 
 
 def run():
@@ -26,7 +27,7 @@ def run():
     file_list = emails_from_dir()
 
     # run worker and print results
-    result = worker(file_list, find_most_common_words, limit=100)
+    result = worker(file_list, find_most_common_words, limit=1000)
 
     print('Result is {}'.format(result))
 

@@ -1,6 +1,8 @@
 import collections
 import multiprocessing
 
+from celery import group as group_celery_tasks
+
 from .lib import chunked_iterator
 
 # NOTE: simplified to functions, may be wrap in class will be more clear
@@ -35,9 +37,20 @@ def multiprocessing_worker(
     return dict(counter.most_common(most_common))
 
 
-def celery_worker():
-    # TODO: add celery worker and run
-    pass
+def celery_worker(
+        file_list, processing_func=None, limit=None, chunks=100,
+        most_common=10, pool_num=1):
+    counter = collections.Counter()
+    results = []
+
+    for file_list in chunked_iterator(file_list, chunks, limit=limit):
+        results.append(processing_func.s(file_list))
+
+    results = group_celery_tasks(results)()
+    for result in results.get(timeout=2 * chunks):
+        counter.update(result)
+
+    return dict(counter.most_common(most_common))
 
 
 
