@@ -24,9 +24,11 @@ def multiprocessing_worker(
         file_list, processing_func=None, limit=None, chunks=100,
         most_common=10, pool_num=1):
     real_cpu_count = multiprocessing.cpu_count()
+    pool_num = pool_num if pool_num > real_cpu_count else real_cpu_count
+    print('Using {} processes to calculate words'.format(pool_num))
+
     counter = collections.Counter()
-    pool = multiprocessing.Pool(
-        pool_num if pool_num > real_cpu_count else real_cpu_count)
+    pool = multiprocessing.Pool(pool_num)
 
     file_lists = chunked_iterator(file_list, chunks, limit=limit)
     results = pool.map(processing_func, file_lists)
@@ -53,7 +55,7 @@ def celery_worker(
     # wait for results
     results = group_celery_tasks(results)()
 
-    for result in results.get(timeout=2 * chunks):
+    for result in results.get():
         counter.update(result)
 
     return dict(counter.most_common(most_common))
