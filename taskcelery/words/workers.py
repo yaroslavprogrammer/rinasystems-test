@@ -40,21 +40,25 @@ def multiprocessing_worker(
 def celery_worker(
         file_list, processing_func=None, limit=None, chunks=100,
         most_common=10, pool_num=1):
+    print(
+        "Please start Celery server by running "
+        "'celery -A words.tasks worker' and provide any args as you want")
+
     counter = collections.Counter()
     results = []
 
     for file_list in chunked_iterator(file_list, chunks, limit=limit):
         results.append(processing_func.s(file_list))
 
+    # wait for results
     results = group_celery_tasks(results)()
+
     for result in results.get(timeout=2 * chunks):
         counter.update(result)
 
     return dict(counter.most_common(most_common))
 
 
-
-default_worker = linear_worker
 registered = [
     linear_worker, multiprocessing_worker, celery_worker
 ]

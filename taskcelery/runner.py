@@ -5,16 +5,20 @@ from words.lib import emails_from_dir
 from words.tasks import find_most_common_words
 
 
-def run():
+def run(default_worker='linear'):
     """Get appropriate worker from workers module and run it"""
-    # NOTE: argsparse module will be more prettier
+    # NOTE: argsparse module will be more prettier and robust
 
     # get worker name from arg
     try:
         worker_name = sys.argv[1]
     except IndexError:
-        worker_name = 'default'
+        worker_name = default_worker
 
+        print("You don't provided worker name using default: {}".format(
+            worker_name))
+
+    # get worker func from module
     try:
         worker = getattr(workers, '{}_worker'.format(worker_name))
     except AttributeError:
