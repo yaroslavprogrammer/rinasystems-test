@@ -10,4 +10,4 @@
 4. To run tasks just `cd taskcelery` and `python runner celery 4000` (4000 is number of files will be scanned) then open another console in same dir then activate env by `source env.sh` and run `celery -A words.tasks worker` with any args as you want. There are `linear and multiprocessing` workers available in runner.
 5. For gui task open `taskgui/index.html` (will be updated soon)
 
-# All taks was runned in Core i7 6500U. Gained perfomance 20s per 4000 files using 4 parallel workers. Finded bottleneck is nltk function
+### All taks was runned in Core i7 6500U. Gained perfomance 35s per 10000 files using 4 parallel workers. Finded bottleneck is nltk function
