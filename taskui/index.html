@@ -1,0 +1,168 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>UI Task</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="bower_components/jstree-bootstrap-theme/dist/themes/proton/style.min.css">
+        <style>
+        #resizable-content {
+          display: table;
+          position: relative;
+          width: 100%;
+        }
+        .moved-splitter {
+          background-color: #ccc;
+          display: block;
+          width: 2px;
+          height: auto;
+          position: absolute;
+          cursor: col-resize;
+        }
+        #resizable-content .splitter {
+          background-color: #ccc;
+          height: 100%;
+          display: table-cell;
+          width: 5px;
+          cursor: col-resize;
+        }
+        #resizable-content .moved-splitter {
+          position: absolute;
+          display: block;
+        }
+        #resizable-content .left-block {
+          display: table-cell;
+        }
+        #resizable-content .right-block {
+          vertical-align: top;
+          display: table-cell;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+          <div class="col-md-12">
+            <ul class="nav nav-tabs" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a>
+              </li>
+              <li role="presentation">
+                <a href="#review" aria-controls="review" role="tab" data-toggle="tab">Review</a>
+              </li>
+              <li role="presentation">
+                <a href="#admin" aria-controls="admin" role="tab" data-toggle="tab">Admin</a>
+              </li>
+            </ul>
+          </div>
+          </div>
+
+          <div id="resizable-content">
+            <div class="left-block">
+                <div id="jstree-example"></div>
+            </div>
+            <div class="splitter"></div>
+
+            <div class="right-block">
+              <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="home">
+                    <table class="table"> <thead> <tr> <th>#</th> <th>Column heading</th> <th>Column heading</th> <th>Column heading</th> </tr> </thead> <tbody> <tr class="active"> <th scope="row">1</th> <td>Column content</td> <td>Column content</td> <td>Column content</td> </tr> <tr> <th scope="row">2</th> <td>Column content</td> <td>Column content</td> <td>Column content</td> </tr> <tr class="success"> <th scope="row">3</th> <td>Column content</td> <td>Column content</td> <td>Column content</td> </tr> <tr> <th scope="row">4</th> <td>Column content</td> <td>Column content</td> <td>Column content</td> </tr> <tr class="info"> <th scope="row">5</th> <td>Column content</td> <td>Column content</td> <td>Column content</td> </tr> <tr> <th scope="row">6</th> <td>Column content</td> <td>Column content</td> <td>Column content</td> </tr> <tr class="warning"> <th scope="row">7</th> <td>Column content</td> <td>Column content</td> <td>Column content</td> </tr> <tr> <th scope="row">8</th> <td>Column content</td> <td>Column content</td> <td>Column content</td> </tr> <tr class="danger"> <th scope="row">9</th> <td>Column content</td> <td>Column content</td> <td>Column content</td> </tr> </tbody> </table>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="review">...review</div>
+                <div role="tabpanel" class="tab-pane" id="admin">...admin</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="bower_components/jstree-bootstrap-theme/dist/jstree.min.js"></script>
+
+        <script>
+          // splitter
+          $(document).ready(function() {
+            var dragging = false;
+
+            $('#resizable-content .splitter').mousedown(function(e){
+              e.preventDefault();
+              dragging = true;
+              leftBlock = $('#resizable-content').find('.left-block');
+              var ghostbar = $('<div>', {
+                class:'moved-splitter',
+                css: {
+                    height: leftBlock.parent().outerHeight(),
+                    top: leftBlock.offset().top,
+                    left: e.pageX
+                }
+              }).appendTo('body');
+
+              $(document).mousemove(function(e){
+                ghostbar.css("left", e.pageX);
+              });
+            });
+
+            $(document).mouseup(function(e){
+               if (dragging) {
+                 leftBlock = $('#resizable-content').find('.left-block');
+                 leftBlock.css("width",  e.pageX - leftBlock.offset().left);
+                 $('body .moved-splitter').remove();
+                 $(document).unbind('mousemove');
+                 dragging = false;
+               }
+            });
+
+            // jstree
+            $('#jstree-example').jstree({
+              'plugins': ["wholerow", "checkbox"],
+              'core': {
+                  'data': [{
+                          "text": "Wholerow with checkboxes",
+                          "children": [{
+                              "text": "initially selected",
+                              "state": {
+                                  "selected": true
+                              }
+                          }, {
+                              "text": "custom icon URL",
+                              "icon": "./assets/images/tree_icon.png"
+                          }, {
+                              "text": "initially open",
+                              "state": {
+                                  "opened": true
+                              },
+                              "children": ["Another node"]
+                          }, {
+                              "text": "custom icon class",
+                              "icon": "glyphicon glyphicon-leaf"
+                          }]
+                      },
+                      "And wholerow selection"
+                  ],
+                  'themes': {
+                      'name': 'proton',
+                      'responsive': true
+                  }
+              }
+            });
+
+            // hash read for tabs
+            var changeTab = function() {
+              if (location.hash !== '') $('a[href="' + location.hash + '"]').tab('show');
+            }
+            changeTab();
+            $(window).on('hashchange', changeTab);
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+                if (history.pushState) {
+                  history.pushState(null, null, '#'+$(e.target).attr('href').substr(1));
+                } else {
+                  location.hash = '#' + $(e.target).attr('href').substr(1);
+                }
+            });
+          });
+        </script>
+    </body>
+</html>
