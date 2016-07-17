@@ -16,11 +16,14 @@ def word_filter(word):
     return len(word) > 1
 
 
-def chunked_iterator(iterable, n, limit=None):
+def chunked_generator(iterable, n, limit=None):
     """Collect data into chunks or blocks and limit iterations."""
-    # chunked_iterator('ABCDEFG', 3) --> ABC DEF G"
+    # chunked_generator('ABCDEFG', 3) --> ABC DEF G"
     iterator = iter(iterable)
     index = 0
+
+    if limit and limit < n:
+        n = limit
 
     while True:
         chunk = tuple(itertools.islice(iterator, n))
